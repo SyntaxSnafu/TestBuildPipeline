@@ -1,0 +1,105 @@
+param(
+    [string]$RepoUrl,       # Repo to clone
+    [string]$Commit,        # Commit hash to check out
+    [string]$UnityVersion,  # Unity version to use
+    [string]$Platforms      # "Windows,Android,iOS"
+)
+
+$BaseBuildDir = "C:\BuildServer\Repos"
+$BaseOutputDir = "C:\BuildServer\Output"
+
+# Extract repo name from URL
+# e.g. https://github.com/user/MyGame.git → MyGame
+$RepoName = ($RepoUrl.Split('/')[-1]).Replace(".git","")
+
+# Working directory for this build
+$RepoPath = "$BaseBuildDir\$RepoName"
+
+Write-Host "`n=== CLEAN AND PREPARE WORK DIR ==="
+if (Test-Path $RepoPath) {
+    Remove-Item $RepoPath -Recurse -Force
+}
+
+New-Item -ItemType Directory -Path $RepoPath | Out-Null
+
+Write-Host "Repo folder: $RepoPath"
+
+Write-Host "`n=== CLONING REPO ==="
+git clone $RepoUrl $RepoPath
+
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "❌ Git clone failed"
+    exit 1
+}
+
+cd $RepoPath
+git checkout $Commit
+
+Write-Host "`nUsing commit $Commit"
+
+# Unity path
+$UnityExe = "C:\Program Files\Unity\Hub\Editor\$UnityVersion\Editor\Unity.exe"
+if (!(Test-Path $UnityExe)) {
+    Write-Error "❌ Unity version $UnityVersion not found!"
+    exit 1
+}
+
+Write-Host "`n=== STARTING UNITY BUILD ==="
+
+& $UnityExe `
+    -quit -batchmode `
+    -projectPath $RepoPath `
+    -executeMethod BuildPipelineScript.BuildFromCLI `
+    -platforms "$Platforms"
+
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "❌ Unity build failed!"
+    exit 1
+}
+
+Write-Host "`n=== UNITY BUILD COMPLETE ==="
+
+# Create output folder
+$ProjectOutput = "$BaseOutputDir\$RepoName"
+
+if (!(Test-Path $ProjectOutput)) {
+    New-Item -ItemType Directory -Path $ProjectOutput | Out-Null
+}
+
+Write-Host "Output folder: $ProjectOutput"
+
+Write-Host "`n=== COPYING PLATFORM BUILDS ==="
+
+$PlatformList = $Platforms.Split(',')
+
+foreach ($platform in $PlatformList) {
+    $platform = $platform.Trim()
+
+    switch ($platform) {
+        "Windows"  { $Source = "$RepoPath\Builds\Windows" }
+        "Android"  { $Source = "$RepoPath\Builds\Android" }
+        "iOS"      { $Source = "$RepoPath\Builds\iOS" }
+        "WebGL"    { $Source = "$RepoPath\Builds\WebGL" }
+        default    {
+            Write-Host "⚠ Unknown platform '$platform', skipping"
+            continue
+        }
+    }
+
+    if (!(Test-Path $Source)) {
+        Write-Host "⚠ No output for $platform (folder missing), skipping copy"
+        continue
+    }
+
+    $PlatformOutput = "$ProjectOutput\$platform"
+
+    if (!(Test-Path $PlatformOutput)) {
+        New-Item -ItemType Directory -Path $PlatformOutput | Out-Null
+    }
+
+    Write-Host "Copying $platform → $PlatformOutput"
+
+    Copy-Item "$Source\*" $PlatformOutput -Recurse -Force
+}
+
+Write-Host "`n=== BUILD PROCESS COMPLETE ==="
