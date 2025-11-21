@@ -9,7 +9,6 @@ $BaseBuildDir = "C:\BuildServer\Repos"
 $BaseOutputDir = "C:\BuildServer\Output"
 
 # Extract repo name from URL
-# e.g. https://github.com/user/MyGame.git → MyGame
 $RepoName = ($RepoUrl.Split('/')[-1]).Replace(".git","")
 
 # Working directory for this build
@@ -65,13 +64,30 @@ if ($unityProcess.ExitCode -ne 0) {
 
 Write-Host "=== Unity Build Finished ==="
 
-# Create output folder
-$ProjectOutput = "$BaseOutputDir\$RepoName"
+Write-Host "`n=== PREPARING OUTPUT FOLDER ==="
+# Get Project Version
+function Get-ProjectVersion{
+    param([string]$RepoPath)
+
+    $projectSettingsPath = "$RepoPath\ProjectSettings\ProjectSettings.asset"
+    if (Test-Path $projectSettingsPath) {
+        $content = Get-Content $projectSettingsPath
+        foreach ($line in $content) {
+            if ($line -match 'bundleVersion:\s*(\S+)') {
+                return $matches[1]
+            }
+        }
+    }
+    return "UnknownVersion"
+}
+$Version = Get-ProjectVersion -RepoPath $RepoPath
+Write-Host "Project Version: $Version"
+
+$ProjectOutput = "$BaseOutputDir\$RepoName\$Version"
 
 if (!(Test-Path $ProjectOutput)) {
     New-Item -ItemType Directory -Path $ProjectOutput | Out-Null
 }
-
 Write-Host "Output folder: $ProjectOutput"
 
 Write-Host "`n=== COPYING PLATFORM BUILDS ==="
