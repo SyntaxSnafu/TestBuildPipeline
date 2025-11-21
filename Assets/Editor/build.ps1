@@ -44,20 +44,26 @@ if (!(Test-Path $UnityExe)) {
     exit 1
 }
 
-Write-Host "`n=== STARTING UNITY BUILD ==="
+Write-Host "=== Starting Unity Build ==="
+$arguments = @(
+    "-quit"
+    "-batchmode"
+    "-nographics"
+    "-projectPath `"$RepoPath`""
+    "-executeMethod BlocBuildPipeline.BuildFromCLI"
+    "-platforms `"$Platforms`""
+    "-logFile `"$RepoPath\build.log`""
+)
 
-& $UnityExe `
-    -quit -batchmode `
-    -projectPath $RepoPath `
-    -executeMethod BuildPipelineScript.BuildFromCLI `
-    -platforms "$Platforms"
+$unityProcess = Start-Process -FilePath $UnityExe -ArgumentList $arguments -PassThru
+$unityProcess.WaitForExit()
 
-if ($LASTEXITCODE -ne 0) {
-    Write-Error "❌ Unity build failed!"
+if ($unityProcess.ExitCode -ne 0) {
+    Write-Error "Unity build failed with exit code $($unityProcess.ExitCode)"
     exit 1
 }
 
-Write-Host "`n=== UNITY BUILD COMPLETE ==="
+Write-Host "=== Unity Build Finished ==="
 
 # Create output folder
 $ProjectOutput = "$BaseOutputDir\$RepoName"
