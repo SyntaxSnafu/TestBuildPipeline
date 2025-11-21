@@ -73,7 +73,7 @@ function Get-ProjectVersion{
     if (Test-Path $projectSettingsPath) {
         $content = Get-Content $projectSettingsPath
         foreach ($line in $content) {
-            if ($line -match 'bundleVersion:\s*(\S+)') {
+            if ($line -match '^\s*bundleVersion\s*:\s*"?([^\s"]+)"?') {
                 return $matches[1]
             }
         }
