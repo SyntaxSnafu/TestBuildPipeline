@@ -36,6 +36,44 @@ git checkout $Commit
 
 Write-Host "`nUsing commit $Commit"
 
+# Get Project Version
+function Get-ProjectVersion{
+    param([string]$RepoPath)
+
+    $projectSettingsPath = "$RepoPath\ProjectSettings\ProjectSettings.asset"
+    if (Test-Path $projectSettingsPath) {
+        $content = Get-Content $projectSettingsPath
+        foreach ($line in $content) {
+            if ($line -match '^\s*bundleVersion\s*:\s*"?([^\s"]+)"?') {
+                return $matches[1]
+            }
+        }
+    }
+    return "UnknownVersion"
+}
+$Version = Get-ProjectVersion -RepoPath $RepoPath
+Write-Host "Project Version: $Version"
+
+$UnityHubExe = "C:\Program Files\Unity Hub\Unity Hub.exe"
+$PathToTest = "C:\Program Files\Unity\Hub\Editor\$UnityVersion"
+if (!(Test-Path $PathToTest)) {
+    Write-Error "❌ Unity version $UnityVersion is not installed!"
+    $UnityInstallProcess = Start-Process -FilePath $UnityHubExe -ArgumentList "-- --headless install --version $UnityVersion" -PassThru
+    $UnityInstallProcess.WaitForExit()
+    if ($UnityInstallProcess.ExitCode -ne 0) {
+        Write-Error "❌ Unity installation failed with exit code $($UnityInstallProcess.ExitCode)"
+        exit 1
+    }
+    Write-Host "✅ Unity version $UnityVersion installed successfully."
+    $UnityModuleInstallProcess = Start-Process -FilePath $UnityHubExe -ArgumentList "-- --headless install-modules --version $UnityVersion -m windows windows-mono android android-sdk-ndk-tools android-open-jdk ios webgl" -PassThru
+    $UnityModuleInstallProcess.WaitForExit()
+    if ($UnityModuleInstallProcess.ExitCode -ne 0) {
+        Write-Error "❌ Unity module installation failed with exit code $($UnityModuleInstallProcess.ExitCode)"
+        exit 1
+    }
+    Write-Host "✅ Unity modules for version $UnityVersion installed successfully."
+}
+
 # Unity path
 $UnityExe = "C:\Program Files\Unity\Hub\Editor\$UnityVersion\Editor\Unity.exe"
 if (!(Test-Path $UnityExe)) {
@@ -65,23 +103,6 @@ if ($unityProcess.ExitCode -ne 0) {
 Write-Host "=== Unity Build Finished ==="
 
 Write-Host "`n=== PREPARING OUTPUT FOLDER ==="
-# Get Project Version
-function Get-ProjectVersion{
-    param([string]$RepoPath)
-
-    $projectSettingsPath = "$RepoPath\ProjectSettings\ProjectSettings.asset"
-    if (Test-Path $projectSettingsPath) {
-        $content = Get-Content $projectSettingsPath
-        foreach ($line in $content) {
-            if ($line -match '^\s*bundleVersion\s*:\s*"?([^\s"]+)"?') {
-                return $matches[1]
-            }
-        }
-    }
-    return "UnknownVersion"
-}
-$Version = Get-ProjectVersion -RepoPath $RepoPath
-Write-Host "Project Version: $Version"
 
 $ProjectOutput = "$BaseOutputDir\$RepoName\$Version"
 
