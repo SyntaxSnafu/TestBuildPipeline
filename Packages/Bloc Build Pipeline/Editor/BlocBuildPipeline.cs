@@ -15,15 +15,18 @@ namespace com.bloc.BuildPipeline.Editor
             string platformsArg = GetArg(args, "-platforms");  // Example: "Windows,Android"
             var platforms = platformsArg.Split(',').Select(x => x.Trim());
 
+            string projectName = PlayerSettings.productName;
             foreach (var platform in platforms)
             {
                 switch (platform)
                 {
                     case "Windows":
-                        Build(BuildTarget.StandaloneWindows64, "Builds/Windows");
+                        string windowsPath = $"Builds/Windows/{projectName}.exe";
+                        Build(BuildTarget.StandaloneWindows64, windowsPath);
                         break;
                     case "Android":
-                        Build(BuildTarget.Android, "Builds/Android");
+                        string androidPath = $"Builds/Android/{projectName}.apk";
+                        Build(BuildTarget.Android, androidPath);
                         break;
                     case "iOS":
                         Build(BuildTarget.iOS, "Builds/iOS");
