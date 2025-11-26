@@ -220,6 +220,8 @@ namespace com.bloc.BuildPipeline.Editor
                             case 0:
                                 break;
                             case 1:
+                                Debug.Log("Build finished");
+                                cancellationTokenSource.Cancel();
                                 break;
                             case 400:
                                 Debug.LogError("Build failed with client error.");
