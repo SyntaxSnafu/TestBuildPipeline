@@ -1,5 +1,11 @@
 {
   "dependencies": {
+    "com.blocdigital.buildpipeline": {
+      "version": "file:Bloc Build Pipeline",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
+    },
     "com.unity.burst": {
       "version": "1.8.21",
       "depth": 1,

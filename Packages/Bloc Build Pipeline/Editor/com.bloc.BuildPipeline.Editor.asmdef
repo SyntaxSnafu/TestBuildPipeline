@@ -1,0 +1,14 @@
+{
+    "name": "com.bloc.BuildPipeline.Editor",
+    "rootNamespace": "com.bloc.BuildPipeline.Editor",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

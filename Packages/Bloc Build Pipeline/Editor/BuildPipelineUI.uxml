@@ -1,0 +1,18 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Packages/com.blocdigital.buildpipeline/Editor/BuildPipelineUI.uss?fileID=7433441132597879392&amp;guid=ffd8f03f98e2f79448726beb019f24d7&amp;type=3#BuildPipelineUI" />
+    <ui:Label text="Build Pipeline" name="Title" class="custom-label" style="padding-top: 8px; padding-right: 8px; padding-bottom: 8px; padding-left: 8px;" />
+    <ui:ScrollView>
+        <ui:TextField picking-mode="Ignore" label="Repo Git" name="RepoInputField" />
+        <ui:TextField picking-mode="Ignore" label="Commit Hash" name="CommitHashInputField" />
+        <ui:TextField picking-mode="Ignore" label="Unity Version" tooltip="Must be latest path of version" name="UnityVersionInputField" />
+        <ui:TextField picking-mode="Ignore" label="Unity Changeset" tooltip="Must be latest path of version" name="UnityChangesetInputField" />
+        <ui:Toggle label="Windows" value="false" name="WindowsToggle" />
+        <ui:Toggle label="Android" name="AndroidToggle" />
+        <ui:Toggle label="iOS" name="iOSToggle" />
+        <ui:Toggle label="WebGL" name="WebGLToggle" />
+        <ui:Button text="Refresh Defaults" parse-escape-sequences="true" display-tooltip-when-elided="true" name="RefreshDefaultsButton" />
+        <ui:Button text="Build" parse-escape-sequences="true" display-tooltip-when-elided="true" name="BuildButton" />
+    </ui:ScrollView>
+    <ui:ProgressBar value="0" title="Build Progress" name="BuildProgressBar" />
+    <ui:Label text="Error: " name="ErrorMessageLabel" style="color: rgb(255, 0, 0);" />
+</ui:UXML>

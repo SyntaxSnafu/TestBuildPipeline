@@ -1,0 +1,12 @@
+{
+  "name": "com.blocdigital.buildpipeline",
+  "version": "1.0.1",
+  "displayName": "Build Pipeline",
+  "description": "Build Pipeline",
+  "unity": "2017.1",
+  "unityRelease": "0b5",
+  "author": {
+    "name": "Cole Osborne"
+  },
+  "_fingerprint": "10cd0da2edda4d13bdfe98318986ab8ccb0ebf49"
+}
