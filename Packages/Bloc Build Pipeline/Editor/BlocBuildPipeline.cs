@@ -1,5 +1,6 @@
 #if UNITY_EDITOR
 
+using System;
 using System.Linq;
 using UnityEditor;
 using UnityEditor.Build.Reporting;
@@ -43,22 +44,29 @@ namespace com.bloc.BuildPipeline.Editor
 
         private static void Build(BuildTarget target, string path)
         {
-            EditorUserBuildSettings.SwitchActiveBuildTarget(UnityEditor.BuildPipeline.GetBuildTargetGroup(target), target);
-
-            string[] scenes = EditorBuildSettings.scenes
-                .Where(s => s.enabled).Select(s => s.path).ToArray();
-
-            BuildPlayerOptions options = new BuildPlayerOptions
+            try
             {
-                scenes = scenes,
-                target = target,
-                locationPathName = path
-            };
+                EditorUserBuildSettings.SwitchActiveBuildTarget(UnityEditor.BuildPipeline.GetBuildTargetGroup(target), target);
 
-            BuildReport report = UnityEditor.BuildPipeline.BuildPlayer(options);
+                string[] scenes = EditorBuildSettings.scenes
+                    .Where(s => s.enabled).Select(s => s.path).ToArray();
 
-            if (report.summary.result != BuildResult.Succeeded)
-                throw new System.Exception($"Build failed for {target}!");
+                BuildPlayerOptions options = new BuildPlayerOptions
+                {
+                    scenes = scenes,
+                    target = target,
+                    locationPathName = path
+                };
+
+                BuildReport report = UnityEditor.BuildPipeline.BuildPlayer(options);
+
+                if (report.summary.result != BuildResult.Succeeded)
+                    throw new System.Exception($"Build failed for {target}!");
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+            }
         }
 
         private static string GetArg(string[] args, string name)
