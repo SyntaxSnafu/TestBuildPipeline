@@ -1,3 +1,5 @@
+#if UNITY_EDITOR
+
 using System;
 using System.IO;
 using System.Net.Http;
@@ -106,14 +108,10 @@ namespace com.bloc.BuildPipeline.Editor
             string commitHash = File.ReadAllText(commitHashPath);
             if (commitHash.StartsWith("ref:"))
             {
-                commitHashPath = Path.Combine(projectPath, ".git", "FETCH_HEAD");
-
-                if (File.Exists(commitHashPath))
-                {
-                    commitHash = File.ReadAllText(commitHashPath).Trim(); 
-                    commitHash = commitHash.Split((char[])null, StringSplitOptions.RemoveEmptyEntries)[0].Trim();
-                }
-                else commitHash = "";
+                string refPath = commitHash.Substring(5).Trim();
+                string fullRefPath = Path.Combine(projectPath, ".git", refPath);
+                
+                commitHash = File.ReadAllText(fullRefPath).Trim();
             }
             commitHashTextField.value = commitHash;
             
@@ -327,3 +325,5 @@ namespace com.bloc.BuildPipeline.Editor
         public string BuildID;
     }
 }
+
+#endif

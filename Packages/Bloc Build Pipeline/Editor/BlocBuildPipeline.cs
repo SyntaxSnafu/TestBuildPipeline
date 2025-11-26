@@ -1,3 +1,5 @@
+#if UNITY_EDITOR
+
 using System.Linq;
 using UnityEditor;
 using UnityEditor.Build.Reporting;
@@ -63,3 +65,5 @@ namespace com.bloc.BuildPipeline.Editor
         }
     }
 }
+
+#endif
