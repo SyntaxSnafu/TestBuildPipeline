@@ -1,7 +1,7 @@
 using System.Net.Http;
 using System.Text;
 using UnityEngine;
-using UnityEditor;
+//using UnityEditor;
 
 public class Test : MonoBehaviour
 {
@@ -9,8 +9,8 @@ public class Test : MonoBehaviour
     //private readonly string baseUrl = "http://127.0.0.1:8080/";
     
     // Start is called before the first frame update
-    async void Start()
+    void Start()
     {
-        Debug.Log(UnityEditor.PlayerSettings.productName);
+        //Debug.Log(UnityEditor.PlayerSettings.productName);
     }
 }
